@@ -17,6 +17,25 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    
+    // Get screen dimension
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    int width = screenRect.size.width;
+    int height = screenRect.size.height;
+    
+    // Create wallpaper
+    UIImageView *imageHolder = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
+    UIImage *image = [UIImage imageNamed:@"Wallpaper"];
+    imageHolder.image = image;
+    [self.view addSubview:imageHolder];
+    
+    // get current day of the month
+    NSDate *date = [NSDate date];
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [calendar components:NSCalendarUnitDay fromDate:date];
+    int day = (int) (components.day);
+    
+    NSLog(@"Current day is %d\n",day);
 }
 
 

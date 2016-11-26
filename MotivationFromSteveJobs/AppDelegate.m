@@ -17,6 +17,13 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    NSString *quote = [[DBManager getSharedInstance]findById:31];
+    
+    NSLog(@"\n \n ********************************************************** \n");
+    NSLog(@"Quote is: %@\n",quote);
+    NSLog(@"\n ********************************************************** \n \n");
+    
     return YES;
 }
 

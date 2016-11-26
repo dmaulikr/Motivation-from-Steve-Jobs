@@ -24,6 +24,9 @@
 // insert data into database
 -(BOOL) insertData:(int)quoteId quote:(NSString*)quote;
 
+// populate the database
+-(BOOL) populateDatabase;
+
 // find the quote by id
 -(NSString*) findById:(int)quoteId;
 @end
