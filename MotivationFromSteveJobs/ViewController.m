@@ -62,8 +62,21 @@
     // Vertical center alignment
     [self adjustContentSize:_textQuote];
     
-    [self.view addSubview:_textQuote];
+    // Get if this is the first time of running the app
+    BOOL boNotFirstTime = [[NSUserDefaults standardUserDefaults] boolForKey:@"FirstTime"];
     
+    if(boNotFirstTime == NO)
+    {
+        // create push notification when running app for first time
+        [self createPushNotification:9 m:0];
+        
+        // store these values
+        [[NSUserDefaults standardUserDefaults]setBool:YES forKey:@"FirstTime"];
+        [[NSUserDefaults standardUserDefaults]setInteger:9 forKey:@"Hour"];
+        [[NSUserDefaults standardUserDefaults]setInteger:0 forKey:@"Minute"];
+    }
+
+    [self.view addSubview:_textQuote];
 }
 
 // Function that vertically aligns the text view
@@ -73,9 +86,54 @@
     tv.contentInset = UIEdgeInsetsMake(inset, tv.contentInset.left, inset, tv.contentInset.right);
 }
 
+-(void) createPushNotification:(int)hour m:(int)minute
+{
+    // first of all, cancel all notifications
+    [[UIApplication sharedApplication] cancelAllLocalNotifications];
+    
+    NSDate *now = [NSDate date];
+    NSCalendar *calendarN = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    
+    // create the date from today at the desired hour
+    NSDateComponents *componentsN = [calendarN components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:now];
+    [componentsN setHour:hour];
+    [componentsN setMinute:minute];
+    
+    // Gives us today's date but at desired hour
+    NSDate *nextNotificationDate = [calendarN dateFromComponents:componentsN];
+    if ([nextNotificationDate timeIntervalSinceNow] < 0) {
+        // If today's 9am already occurred, add 24hours to get to tomorrow's
+        nextNotificationDate = [nextNotificationDate dateByAddingTimeInterval:60*60*24];
+    }
+    
+    // create the notification
+    UILocalNotification *notification = [[UILocalNotification alloc] init];
+    notification.fireDate = nextNotificationDate;
+    notification.alertBody = @"New quote by Steve Jobs!";
+    notification.soundName = UILocalNotificationDefaultSoundName;
+    // Set a repeat interval to daily
+    notification.repeatInterval = NSCalendarUnitDay;
+    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+// disable auto rotation
+- (NSUInteger) supportedInterfaceOrientations {
+    // Return a bitmask of supported orientations. If you need more,
+    // use bitwise or (see the commented return).
+    return UIInterfaceOrientationMaskPortrait;
+    // return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+}
+
+- (UIInterfaceOrientation) preferredInterfaceOrientationForPresentation {
+    // Return the orientation you'd prefer - this is what it launches to. The
+    // user can still rotate. You don't have to implement this method, in which
+    // case it launches in the current orientation
+    return UIInterfaceOrientationPortrait;
 }
 
 

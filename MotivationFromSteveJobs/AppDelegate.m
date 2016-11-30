@@ -16,14 +16,13 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  
+    // register user for notification settings
+    if ([UIApplication instancesRespondToSelector:@selector(registerUserNotificationSettings:)]){
+        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound categories:nil]];
+    }
+    
     // Override point for customization after application launch.
-    
-    NSString *quote = [[DBManager getSharedInstance]findById:31];
-    
-    NSLog(@"\n \n ********************************************************** \n");
-    NSLog(@"Quote is: %@\n",quote);
-    NSLog(@"\n ********************************************************** \n \n");
-    
     return YES;
 }
 
@@ -36,7 +35,7 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits
 }
 
 
