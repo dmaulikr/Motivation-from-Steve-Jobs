@@ -12,6 +12,9 @@
 @interface ViewController : UIViewController
 
 @property (nonatomic,retain) IBOutlet UITextView *textQuote;
-
+@property (nonatomic)  IBOutlet UIBarButtonItem *barBtnSettings;
+@property (nonatomic)  IBOutlet UIBarButtonItem *barBtnSave;
+@property (nonatomic)  IBOutlet UIBarButtonItem *barBtnFacebook;
+@property (nonatomic)  IBOutlet UIToolbar       *toolbar;
 @end
 
