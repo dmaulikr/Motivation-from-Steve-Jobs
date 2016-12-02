@@ -11,10 +11,12 @@
 
 @interface ViewController : UIViewController
 
-@property (nonatomic,retain) IBOutlet UITextView *textQuote;
-@property (nonatomic)  IBOutlet UIBarButtonItem *barBtnSettings;
-@property (nonatomic)  IBOutlet UIBarButtonItem *barBtnSave;
-@property (nonatomic)  IBOutlet UIBarButtonItem *barBtnFacebook;
-@property (nonatomic)  IBOutlet UIToolbar       *toolbar;
+@property (nonatomic,retain) IBOutlet UITextView  *textQuote;
+@property (nonatomic)  IBOutlet UIBarButtonItem   *barBtnSettings;
+@property (nonatomic)  IBOutlet UIBarButtonItem   *barBtnSave;
+@property (nonatomic)  IBOutlet UIBarButtonItem   *barBtnFacebook;
+@property (nonatomic)  IBOutlet UIToolbar         *toolbar;
+@property (nonatomic,strong) IBOutlet UIDatePicker *dateNotification;
+@property (nonatomic)  IBOutlet UIToolbar         *toolbarNotification;
 @end
 

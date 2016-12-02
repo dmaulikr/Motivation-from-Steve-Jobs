@@ -47,9 +47,9 @@
     _toolbar.frame = CGRectMake(0, 0, width, 50);
     
     // create color for toolbar
-    UIColor *colorToolbar = [UIColor colorWithRed:10.0f/255.0f
-                    green:10.0f/255.0f
-                     blue:10.0f/255.0f
+    UIColor *colorToolbar = [UIColor colorWithRed:3.0f/255.0f
+                    green:3.0f/255.0f
+                     blue:3.0f/255.0f
                     alpha:1.0f];
     _toolbar.barTintColor = colorToolbar;
      
@@ -179,6 +179,55 @@
 -(IBAction)settingsButtonPressed:(id)sender
 {
     NSLog(@"Settings button is pressed \n");
+    
+    // set up the date picker
+    _dateNotification = [[UIDatePicker alloc] init];
+    _dateNotification.datePickerMode = UIDatePickerModeTime;
+    _dateNotification.date = [NSDate date];
+    _dateNotification.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    _dateNotification.frame = CGRectMake(0,400, self.view.frame.size.width, self.view.frame.size.height - 400);
+    
+    // create color for toolbar
+    UIColor *colorDatePicker = [UIColor colorWithRed:140.0f/255.0f
+                                            green:140.0f/255.0f
+                                             blue:140.0f/255.0f
+                                            alpha:1.0f];
+    _dateNotification.backgroundColor = colorDatePicker;
+    
+    // setup the toolbar
+    _toolbarNotification = [[UIToolbar alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,45)];
+    _toolbarNotification.barStyle = UIBarStyleDefault;
+    _toolbarNotification.hidden = NO;
+    UIBarButtonItem *flexibleSpaceLeft = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem* doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(notificationHourChanged)];
+    
+    UIBarButtonItem* notifButton = [[UIBarButtonItem alloc] initWithTitle:@"Notification hour" style:UIBarButtonItemStyleDone target:self action:nil];
+    [notifButton setTintColor:[UIColor blackColor]];
+
+    [_toolbarNotification setItems:[NSArray arrayWithObjects:flexibleSpaceLeft, notifButton,flexibleSpaceLeft,flexibleSpaceLeft, doneButton, nil]];
+    
+    // [_dateNotification addSubview:_toolbarNotification];
+    // _dateNotification.inputAccessoryView = _toolbarNotification;
+    [self.view addSubview:_dateNotification];
+    [self.view addSubview:_toolbarNotification];
+}
+
+// notification hour changed
+-(void) notificationHourChanged
+{
+    NSLog(@"Notification hour changed");
+    
+    // get the date stored in _dateNotification
+    NSDate *notificationDate = [_dateNotification date];
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [calendar components:(NSCalendarUnitHour | NSCalendarUnitMinute) fromDate:notificationDate];
+    int hour = (int) [components hour];
+    int minute = (int) [components minute];
+    
+    NSLog(@"Current notification date is %d:%d \n",hour,minute);
+    
+    _toolbarNotification.hidden = YES;
+    _dateNotification.hidden = YES;
 }
 
 // save button pressed function
