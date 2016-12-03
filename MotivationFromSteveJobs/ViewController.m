@@ -24,6 +24,10 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
+    // Update badge notification number
+    if( [UIApplication sharedApplication].applicationIconBadgeNumber > 0)
+        [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+    
     // Get screen dimension
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     int width = screenRect.size.width;
@@ -47,9 +51,9 @@
     _toolbar.frame = CGRectMake(0, 0, width, 50);
     
     // create color for toolbar
-    UIColor *colorToolbar = [UIColor colorWithRed:10.0f/255.0f
-                    green:10.0f/255.0f
-                     blue:10.0f/255.0f
+    UIColor *colorToolbar = [UIColor colorWithRed:3.0f/255.0f
+                    green:3.0f/255.0f
+                     blue:3.0f/255.0f
                     alpha:1.0f];
     _toolbar.barTintColor = colorToolbar;
      
@@ -120,30 +124,28 @@
     [self adjustContentSize:_textQuote];
     
     // Get if this is the first time of running the app
-    BOOL boNotFirstTime = [[NSUserDefaults standardUserDefaults] boolForKey:@"FirstTime"];
+    BOOL boSecondTime = [[NSUserDefaults standardUserDefaults] boolForKey:@"SecondTime"];
     
-    if(boNotFirstTime == NO)
+    if(boSecondTime == NO)
     {
         // create push notification when running app for first time
         [self createPushNotification:9 m:0];
-        
-        // store these values
-        [[NSUserDefaults standardUserDefaults]setBool:YES forKey:@"FirstTime"];
-        [[NSUserDefaults standardUserDefaults]setInteger:9 forKey:@"Hour"];
-        [[NSUserDefaults standardUserDefaults]setInteger:0 forKey:@"Minute"];
+        [[NSUserDefaults standardUserDefaults]setBool:YES forKey:@"SecondTime"];
     }
 
     [self.view addSubview:_textQuote];
     [self.view addSubview:_toolbar];
 }
 
-// Function that vertically aligns the text view
+// ******************************************************** CENTER TEXT VIEW VERTICALLY (quote)
 -(void)adjustContentSize:(UITextView*)tv{
     CGFloat deadSpace = ([tv bounds].size.height - [tv contentSize].height);
     CGFloat inset = MAX(0, deadSpace/2.0);
     tv.contentInset = UIEdgeInsetsMake(inset, tv.contentInset.left, inset, tv.contentInset.right);
 }
+// *********************************************************************************
 
+// ******************************************************** CREATE PUSH NOTIFICATION
 -(void) createPushNotification:(int)hour m:(int)minute
 {
     // first of all, cancel all notifications
@@ -169,19 +171,146 @@
     notification.fireDate = nextNotificationDate;
     notification.alertBody = @"New quote by Steve Jobs!";
     notification.soundName = UILocalNotificationDefaultSoundName;
+    notification.applicationIconBadgeNumber = 1;
     // Set a repeat interval to daily
     notification.repeatInterval = NSCalendarUnitDay;
     [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+    
+    // store the hour and the minute
+    [[NSUserDefaults standardUserDefaults]setInteger:hour forKey:@"Hour"];
+    [[NSUserDefaults standardUserDefaults]setInteger:minute forKey:@"Minute"];
+    
+    // send a confirmation alert only the current notification is not the default notification
+    if( [[NSUserDefaults standardUserDefaults] boolForKey:@"SecondTime"] == YES )
+    {
+        NSString *message = [[NSString alloc]init];
+        
+        if(hour < 10 && minute < 10)
+            message = [NSString stringWithFormat:@"Notification time changed succesfully to %02d:%02d",hour,minute];
+        
+        if(hour > 9 && minute > 9)
+            message = [NSString stringWithFormat:@"Notification time changed succesfully to %d:%d", hour, minute];
+        
+        if(hour < 10 && minute > 9)
+            message = [NSString stringWithFormat:@"Notification time changed succesfully to %02d:%d",hour,minute];
+        
+        if(hour > 9 && minute < 10)
+            message = [NSString stringWithFormat:@"Notification time changed succesfully to %d:%02d",hour,minute];
+        
+        // send a confirmation alert
+        UIAlertController * alert = [UIAlertController
+                                     alertControllerWithTitle:@"Confirmation"
+                                     message:message
+                                     preferredStyle:UIAlertControllerStyleAlert];
+        
+        UIAlertAction* okButton = [UIAlertAction
+                                   actionWithTitle:@"Great"
+                                   style:UIAlertActionStyleDefault
+                                   handler:^(UIAlertAction * action) {
+                                       //Handle no, thanks button
+                                   }];
+        
+        [alert addAction:okButton];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
 }
+// *********************************************************************************
 
-
-// settings button pressed function
+// ******************************************************** SETTINGS BUTTON PRESSED
 -(IBAction)settingsButtonPressed:(id)sender
 {
     NSLog(@"Settings button is pressed \n");
-}
+    
+    // set up the date picker
+    _dateNotification = [[UIDatePicker alloc] init];
+    _dateNotification.datePickerMode = UIDatePickerModeTime;
+    _dateNotification.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    _dateNotification.frame = CGRectMake(0,400, self.view.frame.size.width, self.view.frame.size.height - 400);
+    
+    // create color
+    UIColor *colorDatePicker = [UIColor colorWithRed:30.0f/255.0f
+                                            green:30.0f/255.0f
+                                             blue:30.0f/255.0f
+                                            alpha:1.0f];
+    _dateNotification.backgroundColor = colorDatePicker;
+    [_dateNotification setValue:[UIColor orangeColor] forKey:@"textColor"];
+    
+    // default value
+    int currentHour = (int) [[NSUserDefaults standardUserDefaults] integerForKey:@"Hour"];
+    int currentMin  = (int) [[NSUserDefaults standardUserDefaults] integerForKey:@"Minute"];
+    NSDate *currentDate = [NSDate date];
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier: NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [gregorian components: NSUIntegerMax fromDate: currentDate];
+    [components setHour: currentHour];
+    [components setMinute: currentMin];
+    NSDate *newDate = [gregorian dateFromComponents: components];
+    _dateNotification.date = newDate;
+    
+    
+    // setup the toolbar
+    _toolbarNotification = [[UIToolbar alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,45)];
+    _toolbarNotification.barStyle = UIBarStyleDefault;
+    _toolbarNotification.hidden = NO;
+    _toolbarNotification.barTintColor = [UIColor blackColor];
+    
+    UIBarButtonItem *flexibleSpaceLeft = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    
+    UIBarButtonItem* doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(notificationHourChanged)];
+   [doneButton setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys: [UIColor orangeColor],  NSForegroundColorAttributeName,nil] forState:UIControlStateNormal];
+    
+    UIBarButtonItem* notifButton = [[UIBarButtonItem alloc] initWithTitle:@"Notification hour" style:UIBarButtonItemStyleDone target:self action:nil];
+    [notifButton setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys: [UIColor orangeColor],  NSForegroundColorAttributeName,nil] forState:UIControlStateNormal];
+    notifButton.enabled = NO;
+    
+    UIBarButtonItem* cancelButton = [[UIBarButtonItem alloc] initWithTitle:@"Cancel" style:UIBarButtonItemStylePlain target:self action:@selector(cancelNotificationHour)];
+    [cancelButton setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys: [UIColor orangeColor],  NSForegroundColorAttributeName,nil] forState:UIControlStateNormal];
 
-// save button pressed function
+    [_toolbarNotification setItems:[NSArray arrayWithObjects:cancelButton, flexibleSpaceLeft, notifButton,flexibleSpaceLeft, doneButton, nil]];
+    
+    // [_dateNotification addSubview:_toolbarNotification];
+    // _dateNotification.inputAccessoryView = _toolbarNotification;
+    [self.view addSubview:_dateNotification];
+    [self.view addSubview:_toolbarNotification];
+}
+// *********************************************************************************
+
+// ******************************************************** NOTIFICATION HOUR CHANGED
+-(void) notificationHourChanged
+{
+    NSLog(@"Notification hour changed");
+    int currentHour = (int) [[NSUserDefaults standardUserDefaults] integerForKey:@"Hour"];
+    int currentMinute  = (int) [[NSUserDefaults standardUserDefaults] integerForKey:@"Minute"];
+    
+    
+    // get the date stored in _dateNotification
+    NSDate *notificationDate = [_dateNotification date];
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDateComponents *components = [calendar components:(NSCalendarUnitHour | NSCalendarUnitMinute) fromDate:notificationDate];
+    int nextHour = (int) [components hour];
+    int nextMinute = (int) [components minute];
+    
+    if(currentHour != nextHour || currentMinute != nextMinute)
+    {
+        NSLog(@"Notification time changed from %d:%d to %d:%d \n", currentHour, currentMinute,nextHour,nextHour);
+        [self createPushNotification:nextHour m:nextMinute];
+    }
+    
+    _toolbarNotification.hidden = YES;
+    _dateNotification.hidden = YES;
+}
+// *********************************************************************************
+
+// ******************************************************** CANCEL NOTIFICATION HOUR
+-(void) cancelNotificationHour
+{
+    NSLog(@"Notification hour canceled \n");
+    
+    _toolbarNotification.hidden = YES;
+    _dateNotification.hidden = YES;
+}
+// *********************************************************************************
+
+// ******************************************************** SAVE BUTTON PRESSED
 -(IBAction)saveButtonPressed:(id)sender
 {
     NSLog(@"Facebook button is pressed \n");
@@ -243,8 +372,9 @@
         [self presentViewController:alert animated:YES completion:nil];
     }
 }
+// *********************************************************************************
 
-// facebook button pressed function
+// ******************************************************** FACEBOOK BUTTON PRESSED
 -(IBAction)facebookButtonPressed:(id)sender
 {
     NSLog(@"Facebook button is pressed\n");
@@ -289,24 +419,27 @@
         [self presentViewController:facebookShare animated:YES completion:nil];
     }
 }
+// *********************************************************************************
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
-// disable auto rotation
+// ******************************************************** DISABLE AUTO ROTATION
 - (NSUInteger) supportedInterfaceOrientations {
     // Return a bitmask of supported orientations. If you need more,
     // use bitwise or (see the commented return).
     return UIInterfaceOrientationMaskPortrait;
     // return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
 }
+// *********************************************************************************
 
-// hide the status bar (the one that contains carrier, name of the app and time on the upper part)
+// ******************************************************** HIDE THE STATUS BAR (time, battery, etc)
 -(BOOL)prefersStatusBarHidden{
     return YES;
 }
+// *********************************************************************************
 
 - (UIInterfaceOrientation) preferredInterfaceOrientationForPresentation {
     // Return the orientation you'd prefer - this is what it launches to. The
