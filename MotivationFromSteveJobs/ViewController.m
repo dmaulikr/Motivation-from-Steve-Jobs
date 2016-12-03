@@ -70,7 +70,7 @@
     // ****************************************************************************************
     
     // ************************************************************************ Save button
-    UIImage *imgSave = [UIImage imageNamed:@"SaveFile_Revert.png"];
+    UIImage *imgSave = [UIImage imageNamed:@"saveLogo.png"];
     
     UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnSave addTarget:self action:@selector(saveButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -82,11 +82,11 @@
     // ****************************************************************************************
     
     // ************************************************************************ Facebook button
-    UIImage *imgFacebook = [UIImage imageNamed:@"FacebookLogo_Revert.png"];
+    UIImage *imgFacebook = [UIImage imageNamed:@"facebookLogo.png"];
     
     UIButton *btnFacebook = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnFacebook addTarget:self action:@selector(facebookButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    btnFacebook.bounds = CGRectMake( 200, 5, 40, 40 );
+    btnFacebook.bounds = CGRectMake( 200, 5, 45, 45 );
     [btnFacebook setImage:imgFacebook forState:UIControlStateNormal];
     [btnFacebook setShowsTouchWhenHighlighted:TRUE];
     _barBtnFacebook = [[UIBarButtonItem alloc] initWithCustomView:btnFacebook];
@@ -202,6 +202,16 @@
                                      alertControllerWithTitle:@"Confirmation"
                                      message:message
                                      preferredStyle:UIAlertControllerStyleAlert];
+        // create color for toolbar
+        UIColor *backgroundColorAlert = [UIColor colorWithRed:130.0f/255.0f
+                                                green:130.0f/255.0f
+                                                 blue:130.0f/255.0f
+                                                alpha:1.0f];
+        UIView *firstSubview = alert.view.subviews.firstObject;
+        UIView *alertContentView = firstSubview.subviews.firstObject;
+        for (UIView *subSubView in alertContentView.subviews) { //This is main catch
+            subSubView.backgroundColor = backgroundColorAlert;//Here you change background
+        }
         
         UIAlertAction* okButton = [UIAlertAction
                                    actionWithTitle:@"Great"
@@ -212,6 +222,10 @@
         
         [alert addAction:okButton];
         [self presentViewController:alert animated:YES completion:nil];
+        [alert.view setTintColor:[UIColor colorWithRed:255.0f/255.0f
+                                                 green:128.0f/255.0f
+                                                  blue:0.0f/255.0f
+                                                 alpha:1.0f]];
     }
 }
 // *********************************************************************************
@@ -339,6 +353,16 @@
                                      alertControllerWithTitle:@"Confirmation"
                                      message:@"Photo saved succesfully, please check you gallery"
                                      preferredStyle:UIAlertControllerStyleAlert];
+        // create color for toolbar
+        UIColor *backgroundColorAlert = [UIColor colorWithRed:130.0f/255.0f
+                                                        green:130.0f/255.0f
+                                                         blue:130.0f/255.0f
+                                                        alpha:1.0f];
+        UIView *firstSubview = alert.view.subviews.firstObject;
+        UIView *alertContentView = firstSubview.subviews.firstObject;
+        for (UIView *subSubView in alertContentView.subviews) { //This is main catch
+            subSubView.backgroundColor = backgroundColorAlert;//Here you change background
+        }
         
         UIAlertAction* okButton = [UIAlertAction
                                    actionWithTitle:@"Great"
@@ -349,7 +373,10 @@
         
         [alert addAction:okButton];
         [self presentViewController:alert animated:YES completion:nil];
-        
+        [alert.view setTintColor:[UIColor colorWithRed:204.0f/255.0f
+                                                 green:102.0f/255.0f
+                                                  blue:0.0f/255.0f
+                                                 alpha:1.0f]];
     }
     else
     {
