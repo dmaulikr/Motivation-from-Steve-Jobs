@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "DBManager.h"
+///    Notification become independent from UIKit
+@import UserNotifications;
 
 @interface ViewController : UIViewController
 

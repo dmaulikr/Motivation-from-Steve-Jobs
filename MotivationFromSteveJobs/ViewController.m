@@ -24,10 +24,6 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    // Update badge notification number
-    if( [UIApplication sharedApplication].applicationIconBadgeNumber > 0)
-        [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
-    
     // Get screen dimension
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     int width = screenRect.size.width;
@@ -130,7 +126,7 @@
     if(boSecondTime == NO)
     {
         // create push notification when running app for first time
-        [self createPushNotification:9 m:0];
+        [self createPushNotification:9 m:0 boAlert:NO];
         [[NSUserDefaults standardUserDefaults]setBool:YES forKey:@"SecondTime"];
     }
 
@@ -147,10 +143,10 @@
 // *********************************************************************************
 
 // ******************************************************** CREATE PUSH NOTIFICATION
--(void) createPushNotification:(int)hour m:(int)minute
+-(void) createPushNotification:(int)hour m:(int)minute boAlert:(BOOL)alert
 {
     // first of all, cancel all notifications
-    [[UIApplication sharedApplication] cancelAllLocalNotifications];
+    [[UNUserNotificationCenter currentNotificationCenter] removeAllPendingNotificationRequests];
     
     NSDate *now = [NSDate date];
     NSCalendar *calendarN = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
@@ -167,67 +163,123 @@
         nextNotificationDate = [nextNotificationDate dateByAddingTimeInterval:60*60*24];
     }
     
-    // create the notification
-    UILocalNotification *notification = [[UILocalNotification alloc] init];
-    notification.fireDate = nextNotificationDate;
-    notification.alertBody = @"New quote by Steve Jobs!";
-    notification.soundName = UILocalNotificationDefaultSoundName;
-    notification.applicationIconBadgeNumber = 1;
-    // Set a repeat interval to daily
-    notification.repeatInterval = NSCalendarUnitDay;
-    [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+    // create the LocalNotification
+    NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
+    dateComponents.hour = hour;
+    dateComponents.minute = minute;
+    UNCalendarNotificationTrigger *trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:dateComponents repeats:YES];
     
-    // store the hour and the minute
-    [[NSUserDefaults standardUserDefaults]setInteger:hour forKey:@"Hour"];
-    [[NSUserDefaults standardUserDefaults]setInteger:minute forKey:@"Minute"];
+    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+    content.title = [NSString localizedUserNotificationStringForKey:@"New quote by Steve Jobs" arguments:nil];
+    content.body = [NSString localizedUserNotificationStringForKey:@"Open the app to see it"
+                                                         arguments:nil];
+    content.sound = [UNNotificationSound defaultSound];
+    NSInteger myValue = 1;
+    NSNumber *number = [NSNumber numberWithInteger: myValue];
+    content.badge = number;
     
-    // send a confirmation alert only the current notification is not the default notification
-    if( [[NSUserDefaults standardUserDefaults] boolForKey:@"SecondTime"] == YES )
-    {
-        NSString *message = [[NSString alloc]init];
-        
-        if(hour < 10 && minute < 10)
-            message = [NSString stringWithFormat:@"Notification time changed succesfully to %02d:%02d",hour,minute];
-        
-        if(hour > 9 && minute > 9)
-            message = [NSString stringWithFormat:@"Notification time changed succesfully to %d:%d", hour, minute];
-        
-        if(hour < 10 && minute > 9)
-            message = [NSString stringWithFormat:@"Notification time changed succesfully to %02d:%d",hour,minute];
-        
-        if(hour > 9 && minute < 10)
-            message = [NSString stringWithFormat:@"Notification time changed succesfully to %d:%02d",hour,minute];
-        
-        // send a confirmation alert
-        UIAlertController * alert = [UIAlertController
-                                     alertControllerWithTitle:@"Confirmation"
-                                     message:message
-                                     preferredStyle:UIAlertControllerStyleAlert];
-        // create color for toolbar
-        UIColor *backgroundColorAlert = [UIColor colorWithRed:130.0f/255.0f
-                                                green:130.0f/255.0f
-                                                 blue:130.0f/255.0f
-                                                alpha:1.0f];
-        UIView *firstSubview = alert.view.subviews.firstObject;
-        UIView *alertContentView = firstSubview.subviews.firstObject;
-        for (UIView *subSubView in alertContentView.subviews) { //This is main catch
-            subSubView.backgroundColor = backgroundColorAlert;//Here you change background
+    // request the notification
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"Quote"
+                                                                          content:content trigger:trigger];
+    ///Schedule localNotification
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+        if (!error)
+        {
+            
+            NSLog(@"NotificationRequest succeeded!\n");
+            
+            // store the hour and the minute
+            [[NSUserDefaults standardUserDefaults]setInteger:hour forKey:@"Hour"];
+            [[NSUserDefaults standardUserDefaults]setInteger:minute forKey:@"Minute"];
+            
+            // send a confirmation alert only the current notification is not the default notification
+            if( alert == YES )
+            {
+                NSString *message = [[NSString alloc]init];
+                
+                if(hour < 10 && minute < 10)
+                    message = [NSString stringWithFormat:@"Notification time changed succesfully to %02d:%02d",hour,minute];
+                
+                if(hour > 9 && minute > 9)
+                    message = [NSString stringWithFormat:@"Notification time changed succesfully to %d:%d", hour, minute];
+                
+                if(hour < 10 && minute > 9)
+                    message = [NSString stringWithFormat:@"Notification time changed succesfully to %02d:%d",hour,minute];
+                
+                if(hour > 9 && minute < 10)
+                    message = [NSString stringWithFormat:@"Notification time changed succesfully to %d:%02d",hour,minute];
+                
+                // send a confirmation alert
+                UIAlertController * alert = [UIAlertController
+                                             alertControllerWithTitle:@"Confirmation"
+                                             message:message
+                                             preferredStyle:UIAlertControllerStyleAlert];
+                // create color for toolbar
+                UIColor *backgroundColorAlert = [UIColor colorWithRed:130.0f/255.0f
+                                                                green:130.0f/255.0f
+                                                                 blue:130.0f/255.0f
+                                                                alpha:1.0f];
+                UIView *firstSubview = alert.view.subviews.firstObject;
+                UIView *alertContentView = firstSubview.subviews.firstObject;
+                for (UIView *subSubView in alertContentView.subviews) { //This is main catch
+                    subSubView.backgroundColor = backgroundColorAlert;//Here you change background
+                }
+                
+                UIAlertAction* okButton = [UIAlertAction
+                                           actionWithTitle:@"Great"
+                                           style:UIAlertActionStyleDefault
+                                           handler:^(UIAlertAction * action) {
+                                               //Handle no, thanks button
+                                           }];
+                
+                [alert addAction:okButton];
+                [self presentViewController:alert animated:YES completion:nil];
+                [alert.view setTintColor:[UIColor colorWithRed:255.0f/255.0f
+                                                         green:165.0f/255.0f
+                                                          blue:0.0f/255.0f
+                                                         alpha:1.0f]];
+            }
+
         }
-        
-        UIAlertAction* okButton = [UIAlertAction
-                                   actionWithTitle:@"Great"
-                                   style:UIAlertActionStyleDefault
-                                   handler:^(UIAlertAction * action) {
-                                       //Handle no, thanks button
-                                   }];
-        
-        [alert addAction:okButton];
-        [self presentViewController:alert animated:YES completion:nil];
-        [alert.view setTintColor:[UIColor colorWithRed:255.0f/255.0f
-                                                 green:165.0f/255.0f
-                                                  blue:0.0f/255.0f
-                                                 alpha:1.0f]];
-    }
+        else
+        {
+            NSLog(@"NotificationRequest failed!\n");
+            
+            // send a confirmation alert
+            UIAlertController * alert = [UIAlertController
+                                         alertControllerWithTitle:@"Confirmation"
+                                         message:@"Failed to change to notification time. Please try again"
+                                         preferredStyle:UIAlertControllerStyleAlert];
+            // create color for toolbar
+            UIColor *backgroundColorAlert = [UIColor colorWithRed:130.0f/255.0f
+                                                            green:130.0f/255.0f
+                                                             blue:130.0f/255.0f
+                                                            alpha:1.0f];
+            UIView *firstSubview = alert.view.subviews.firstObject;
+            UIView *alertContentView = firstSubview.subviews.firstObject;
+            for (UIView *subSubView in alertContentView.subviews) { //This is main catch
+                subSubView.backgroundColor = backgroundColorAlert;//Here you change background
+            }
+            
+            UIAlertAction* okButton = [UIAlertAction
+                                       actionWithTitle:@"OK"
+                                       style:UIAlertActionStyleDefault
+                                       handler:^(UIAlertAction * action) {
+                                           //Handle no, thanks button
+                                       }];
+            
+            [alert addAction:okButton];
+            [self presentViewController:alert animated:YES completion:nil];
+            [alert.view setTintColor:[UIColor colorWithRed:255.0f/255.0f
+                                                     green:165.0f/255.0f
+                                                      blue:0.0f/255.0f
+                                                     alpha:1.0f]];
+
+            
+        }
+    }];
+
 }
 // *********************************************************************************
 
@@ -306,8 +358,8 @@
     
     if(currentHour != nextHour || currentMinute != nextMinute)
     {
-        NSLog(@"Notification time changed from %d:%d to %d:%d \n", currentHour, currentMinute,nextHour,nextHour);
-        [self createPushNotification:nextHour m:nextMinute];
+        NSLog(@"Notification time changed from %d:%d to %d:%d \n", currentHour, currentMinute,nextHour,nextMinute);
+        [self createPushNotification:nextHour m:nextMinute boAlert:YES];
     }
     
     _toolbarNotification.hidden = YES;

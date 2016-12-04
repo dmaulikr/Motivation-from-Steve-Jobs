@@ -8,6 +8,9 @@
 
 #import "AppDelegate.h"
 
+///    Notification become independent from UIKit
+@import UserNotifications;
+
 @interface AppDelegate ()
 
 @end
@@ -18,14 +21,22 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   
     // register user for notification settings
-    if ([UIApplication instancesRespondToSelector:@selector(registerUserNotificationSettings:)]){
-        [application registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound categories:nil]];
-    }
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center requestAuthorizationWithOptions:(UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert)
+                          completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                              if (!error) {
+                                  NSLog(@"request authorization succeeded!");
+                                  // [self showAlert];
+                              }
+                          }];
+    
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     
     // Override point for customization after application launch.
     return YES;
 }
 
+/*
 // ******************************************************** LOCAL NOTIFICATION RECEIVED
 - (void) application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
@@ -33,6 +44,7 @@
     [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
 }
 // *********************************************************************************
+ */
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
