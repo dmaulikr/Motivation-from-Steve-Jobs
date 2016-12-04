@@ -55,26 +55,27 @@
                     green:3.0f/255.0f
                      blue:3.0f/255.0f
                     alpha:1.0f];
+    // _toolbar.barTintColor = colorToolbar;
     _toolbar.barTintColor = colorToolbar;
-     
+    // _toolbar.backgroundColor = [UIColor blackColor];
     
     // ************************************************************************ Settings button
     UIImage *imgSettings = [UIImage imageNamed:@"Settings.png"];
     
     UIButton *btnSettings = [UIButton buttonWithType:UIButtonTypeCustom];
    [btnSettings addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    btnSettings.bounds = CGRectMake( 0, 5, 40, 40 );
+    btnSettings.bounds = CGRectMake( 0, 5, 30, 30 );
     [btnSettings setImage:imgSettings forState:UIControlStateNormal];
     [btnSettings setShowsTouchWhenHighlighted:TRUE];
     _barBtnSettings = [[UIBarButtonItem alloc] initWithCustomView:btnSettings];
     // ****************************************************************************************
     
     // ************************************************************************ Save button
-    UIImage *imgSave = [UIImage imageNamed:@"SaveFile_Revert.png"];
+    UIImage *imgSave = [UIImage imageNamed:@"saveLogo.png"];
     
     UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnSave addTarget:self action:@selector(saveButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    btnSave.bounds = CGRectMake( 100, 5, 40, 40 );
+    btnSave.bounds = CGRectMake( 100, 5, 30, 30 );
     [btnSave setImage:imgSave forState:UIControlStateNormal];
     [btnSave setShowsTouchWhenHighlighted:TRUE];
     _barBtnSave = [[UIBarButtonItem alloc] initWithCustomView:btnSave];
@@ -82,11 +83,11 @@
     // ****************************************************************************************
     
     // ************************************************************************ Facebook button
-    UIImage *imgFacebook = [UIImage imageNamed:@"FacebookLogo_Revert.png"];
+    UIImage *imgFacebook = [UIImage imageNamed:@"facebookLogo.png"];
     
     UIButton *btnFacebook = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnFacebook addTarget:self action:@selector(facebookButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    btnFacebook.bounds = CGRectMake( 200, 5, 40, 40 );
+    btnFacebook.bounds = CGRectMake( 200, 5, 35, 35 );
     [btnFacebook setImage:imgFacebook forState:UIControlStateNormal];
     [btnFacebook setShowsTouchWhenHighlighted:TRUE];
     _barBtnFacebook = [[UIBarButtonItem alloc] initWithCustomView:btnFacebook];
@@ -114,7 +115,7 @@
     
     // Assign quote to label
     _textQuote.text = quote;
-    _textQuote.textColor = [UIColor whiteColor];
+    _textQuote.textColor = [UIColor lightGrayColor];
     _textQuote.backgroundColor = [UIColor blackColor];
     [_textQuote setUserInteractionEnabled:NO];
     _textQuote.font = textViewfont;
@@ -202,6 +203,16 @@
                                      alertControllerWithTitle:@"Confirmation"
                                      message:message
                                      preferredStyle:UIAlertControllerStyleAlert];
+        // create color for toolbar
+        UIColor *backgroundColorAlert = [UIColor colorWithRed:130.0f/255.0f
+                                                green:130.0f/255.0f
+                                                 blue:130.0f/255.0f
+                                                alpha:1.0f];
+        UIView *firstSubview = alert.view.subviews.firstObject;
+        UIView *alertContentView = firstSubview.subviews.firstObject;
+        for (UIView *subSubView in alertContentView.subviews) { //This is main catch
+            subSubView.backgroundColor = backgroundColorAlert;//Here you change background
+        }
         
         UIAlertAction* okButton = [UIAlertAction
                                    actionWithTitle:@"Great"
@@ -212,6 +223,10 @@
         
         [alert addAction:okButton];
         [self presentViewController:alert animated:YES completion:nil];
+        [alert.view setTintColor:[UIColor colorWithRed:255.0f/255.0f
+                                                 green:165.0f/255.0f
+                                                  blue:0.0f/255.0f
+                                                 alpha:1.0f]];
     }
 }
 // *********************************************************************************
@@ -339,6 +354,16 @@
                                      alertControllerWithTitle:@"Confirmation"
                                      message:@"Photo saved succesfully, please check you gallery"
                                      preferredStyle:UIAlertControllerStyleAlert];
+        // create color for toolbar
+        UIColor *backgroundColorAlert = [UIColor colorWithRed:130.0f/255.0f
+                                                        green:130.0f/255.0f
+                                                         blue:130.0f/255.0f
+                                                        alpha:1.0f];
+        UIView *firstSubview = alert.view.subviews.firstObject;
+        UIView *alertContentView = firstSubview.subviews.firstObject;
+        for (UIView *subSubView in alertContentView.subviews) { //This is main catch
+            subSubView.backgroundColor = backgroundColorAlert;//Here you change background
+        }
         
         UIAlertAction* okButton = [UIAlertAction
                                    actionWithTitle:@"Great"
@@ -349,7 +374,10 @@
         
         [alert addAction:okButton];
         [self presentViewController:alert animated:YES completion:nil];
-        
+        [alert.view setTintColor:[UIColor colorWithRed:255.0f/255.0f
+                                                 green:165.0f/255.0f
+                                                  blue:0.0f/255.0f
+                                                 alpha:1.0f]];
     }
     else
     {
@@ -370,6 +398,10 @@
         
         [alert addAction:okButton];
         [self presentViewController:alert animated:YES completion:nil];
+        [alert.view setTintColor:[UIColor colorWithRed:255.0f/255.0f
+                                                 green:165.0f/255.0f
+                                                  blue:0.0f/255.0f
+                                                 alpha:1.0f]];
     }
 }
 // *********************************************************************************
@@ -427,7 +459,7 @@
 }
 
 // ******************************************************** DISABLE AUTO ROTATION
-- (NSUInteger) supportedInterfaceOrientations {
+- (UIInterfaceOrientationMask) supportedInterfaceOrientations {
     // Return a bitmask of supported orientations. If you need more,
     // use bitwise or (see the commented return).
     return UIInterfaceOrientationMaskPortrait;
