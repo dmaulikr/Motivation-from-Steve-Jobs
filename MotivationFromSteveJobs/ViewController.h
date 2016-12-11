@@ -20,5 +20,6 @@
 @property (nonatomic)  IBOutlet UIToolbar         *toolbar;
 @property (nonatomic,strong) IBOutlet UIDatePicker *dateNotification;
 @property (nonatomic)  IBOutlet UIToolbar         *toolbarNotification;
+@property (nonatomic,retain) IBOutlet UITextView  *textAuthor;
 @end
 
