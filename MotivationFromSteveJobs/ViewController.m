@@ -23,15 +23,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
+
     // Get screen dimension
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     int width = screenRect.size.width;
     int height = screenRect.size.height;
     
     // creating the quote text label
-    int labelPosX = width / 3;
-    int labelPosY = height / 7;
+    int labelPosX = width / 4 + 2;
+    int labelPosY = height / 8;
     int labelWidth = width - labelPosX;
     int labelHeight = height - labelPosY *2.5;
     _textQuote = [[UITextView alloc]initWithFrame:CGRectMake(labelPosX, labelPosY,labelWidth,labelHeight)];
@@ -44,7 +44,7 @@
     
     // create the toolbar
     _toolbar = [[UIToolbar alloc] init];
-    _toolbar.frame = CGRectMake(0, 0, width, 50);
+    _toolbar.frame = CGRectMake(0, 0, width, 40);
     
     // create color for toolbar
     UIColor *colorToolbar = [UIColor colorWithRed:3.0f/255.0f
@@ -60,7 +60,7 @@
     
     UIButton *btnSettings = [UIButton buttonWithType:UIButtonTypeCustom];
    [btnSettings addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    btnSettings.bounds = CGRectMake( 0, 5, 30, 30 );
+    btnSettings.bounds = CGRectMake( 0, 5, 25, 25 );
     [btnSettings setImage:imgSettings forState:UIControlStateNormal];
     [btnSettings setShowsTouchWhenHighlighted:TRUE];
     _barBtnSettings = [[UIBarButtonItem alloc] initWithCustomView:btnSettings];
@@ -71,7 +71,7 @@
     
     UIButton *btnSave = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnSave addTarget:self action:@selector(saveButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    btnSave.bounds = CGRectMake( 100, 5, 30, 30 );
+    btnSave.bounds = CGRectMake( 100, 5, 25, 25 );
     [btnSave setImage:imgSave forState:UIControlStateNormal];
     [btnSave setShowsTouchWhenHighlighted:TRUE];
     _barBtnSave = [[UIBarButtonItem alloc] initWithCustomView:btnSave];
@@ -83,7 +83,7 @@
     
     UIButton *btnFacebook = [UIButton buttonWithType:UIButtonTypeCustom];
     [btnFacebook addTarget:self action:@selector(facebookButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    btnFacebook.bounds = CGRectMake( 200, 5, 35, 35 );
+    btnFacebook.bounds = CGRectMake( 200, 5, 30, 30 );
     [btnFacebook setImage:imgFacebook forState:UIControlStateNormal];
     [btnFacebook setShowsTouchWhenHighlighted:TRUE];
     _barBtnFacebook = [[UIBarButtonItem alloc] initWithCustomView:btnFacebook];
@@ -100,15 +100,45 @@
     NSDateComponents *components = [calendar components:NSCalendarUnitDay fromDate:date];
     int day = (int) (components.day);
     
+    // debug screens: 8,9,10,15,24,26,29,
+    // day = 29;
+    
     // get quote of the day
     NSString *quote = [[DBManager getSharedInstance] findById:day];
     
     NSLog(@"Current day is %d\n",day);
     NSLog(@"Quote of the day is: %@\n",quote);
     
-    // create a font
-    UIFont *textViewfont = [UIFont fontWithName:@"Courier" size:20];
-    
+    UIFont *textViewfont;
+    if( day == 8 || day == 9)
+    {
+        if(height < 600)
+           textViewfont = [UIFont fontWithName:@"Courier" size:14];
+        else
+        {
+            if( height > 700)
+                // Iphone 6+, 6S+, 7+
+                textViewfont = [UIFont fontWithName:@"Courier" size:18];
+            // Iphone 6, 6S, 7
+            else textViewfont = [UIFont fontWithName:@"Courier" size:17];
+        }
+    }
+    else
+    {
+        if(height < 600)
+            // Iphone 5, 5S, SE
+            textViewfont = [UIFont fontWithName:@"Courier" size:17];
+        
+        else
+        {
+            if( height > 700)
+                // Iphone 6+,6S+,7+
+               textViewfont = [UIFont fontWithName:@"Courier" size:22];
+            // Iphone 6,6S,7
+            else textViewfont = [UIFont fontWithName:@"Courier" size:20];
+        }
+    }
+
     // Assign quote to label
     _textQuote.text = quote;
     _textQuote.textColor = [UIColor lightGrayColor];
@@ -129,9 +159,29 @@
         [self createPushNotification:9 m:0 boAlert:NO];
         [[NSUserDefaults standardUserDefaults]setBool:YES forKey:@"SecondTime"];
     }
-
+    
+    // create author text
+    int textPosX = width - 120;
+    int textPosY;
+    if( height < 500)
+        textPosY =  height - 25; // Air, Air 2, Pro ( 9.7 ),
+    else textPosY = height - 30;
+    int textWidth = width - textPosX;
+    int textHeight = height - textPosY;
+    _textAuthor = [[UITextView alloc]initWithFrame:CGRectMake(textPosX, textPosY,textWidth,textHeight)];
+    
+    NSString *textCopyright = [NSString stringWithFormat:@"Motivation from Steve Jobs\n%cTarpian Gabriel",169];
+    _textAuthor.text = textCopyright;
+    UIFont *textAuthorFont = [UIFont fontWithName:@"Arial" size:8];
+    _textAuthor.font = textAuthorFont;
+    _textAuthor.textAlignment = NSTextAlignmentRight;
+    _textAuthor.backgroundColor = [UIColor blackColor];
+    _textAuthor.textColor = [UIColor lightGrayColor];
+    [_textAuthor setUserInteractionEnabled:NO];
+    
     [self.view addSubview:_textQuote];
     [self.view addSubview:_toolbar];
+    [self.view addSubview:_textAuthor];
 }
 
 // ******************************************************** CENTER TEXT VIEW VERTICALLY (quote)
@@ -155,13 +205,6 @@
     NSDateComponents *componentsN = [calendarN components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:now];
     [componentsN setHour:hour];
     [componentsN setMinute:minute];
-    
-    // Gives us today's date but at desired hour
-    NSDate *nextNotificationDate = [calendarN dateFromComponents:componentsN];
-    if ([nextNotificationDate timeIntervalSinceNow] < 0) {
-        // If today's 9am already occurred, add 24hours to get to tomorrow's
-        nextNotificationDate = [nextNotificationDate dateByAddingTimeInterval:60*60*24];
-    }
     
     // create the LocalNotification
     NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
@@ -322,7 +365,7 @@
     
     UIBarButtonItem *flexibleSpaceLeft = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
-    UIBarButtonItem* doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(notificationHourChanged)];
+    UIBarButtonItem* doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStylePlain target:self action:@selector(notificationHourChanged)];
    [doneButton setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys: [UIColor orangeColor],  NSForegroundColorAttributeName,nil] forState:UIControlStateNormal];
     
     UIBarButtonItem* notifButton = [[UIBarButtonItem alloc] initWithTitle:@"Notification hour" style:UIBarButtonItemStyleDone target:self action:nil];
@@ -521,7 +564,7 @@
 
 // ******************************************************** HIDE THE STATUS BAR (time, battery, etc)
 -(BOOL)prefersStatusBarHidden{
-    return YES;
+    return NO;
 }
 // *********************************************************************************
 
