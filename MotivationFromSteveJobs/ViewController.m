@@ -242,16 +242,16 @@
                 NSString *message = [[NSString alloc]init];
                 
                 if(hour < 10 && minute < 10)
-                    message = [NSString stringWithFormat:@"Notification time changed succesfully to %02d:%02d",hour,minute];
+                    message = [NSString stringWithFormat:@"Notification time changed successfully to %02d:%02d",hour,minute];
                 
                 if(hour > 9 && minute > 9)
-                    message = [NSString stringWithFormat:@"Notification time changed succesfully to %d:%d", hour, minute];
+                    message = [NSString stringWithFormat:@"Notification time changed successfully to %d:%d", hour, minute];
                 
                 if(hour < 10 && minute > 9)
-                    message = [NSString stringWithFormat:@"Notification time changed succesfully to %02d:%d",hour,minute];
+                    message = [NSString stringWithFormat:@"Notification time changed successfully to %02d:%d",hour,minute];
                 
                 if(hour > 9 && minute < 10)
-                    message = [NSString stringWithFormat:@"Notification time changed succesfully to %d:%02d",hour,minute];
+                    message = [NSString stringWithFormat:@"Notification time changed successfully to %d:%02d",hour,minute];
                 
                 // send a confirmation alert
                 UIAlertController * alert = [UIAlertController
@@ -292,7 +292,7 @@
             // send a confirmation alert
             UIAlertController * alert = [UIAlertController
                                          alertControllerWithTitle:@"Confirmation"
-                                         message:@"Failed to change to notification time. Please try again"
+                                         message:@"Failed to change the notification time. Please try again"
                                          preferredStyle:UIAlertControllerStyleAlert];
             // create color for toolbar
             UIColor *backgroundColorAlert = [UIColor colorWithRed:130.0f/255.0f
@@ -447,7 +447,7 @@
         // send a confirmation alert
         UIAlertController * alert = [UIAlertController
                                      alertControllerWithTitle:@"Confirmation"
-                                     message:@"Photo saved succesfully, please check you gallery"
+                                     message:@"Photo saved successfully. Please check your gallery"
                                      preferredStyle:UIAlertControllerStyleAlert];
         // create color for toolbar
         UIColor *backgroundColorAlert = [UIColor colorWithRed:130.0f/255.0f
@@ -481,7 +481,7 @@
         // send a confirmation alert
         UIAlertController * alert = [UIAlertController
                                      alertControllerWithTitle:@"Error"
-                                     message:@"Errow while saving the photo. Please try again"
+                                     message:@"Error while saving the photo. Please try again"
                                      preferredStyle:UIAlertControllerStyleAlert];
         
         UIAlertAction* okButton = [UIAlertAction
